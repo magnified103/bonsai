@@ -1,3 +1,17 @@
+# Ignore datafiles
+*.csv
+*.csv.gz
+
+
+# Ignore images
+*.png
+
+
+# Ignore jupyter notebooks
+*.ipynb
+
+
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,pycharm
 
