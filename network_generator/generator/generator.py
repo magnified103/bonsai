@@ -10,7 +10,7 @@ class Generator:
 
 This is the default generator. It is used when no other generator is specified.
 
-Parameters:å
+Parameters:
 ------------
 node_generator : NodeGenerator
     The node generator to use.
@@ -38,11 +38,28 @@ generate(self, network_spec)
     """
 
     def __init__(self, node_generator, latency_generator):
+        """Initialize the generator.
+
+        :param node_generator: The node generator to use.
+        :type node_generator: NodeGenerator
+
+        :param latency_generator: The latency generator to use.
+        :type latency_generator: LatencyGenerator
+
+        """
         self.node_generator = node_generator
         self.latency_generator = latency_generator
 
     def generate(self, network_spec):
-        """Generate a network of nodes and edges. """
+        """Generate a network of nodes and edges.
+
+        :param network_spec: Network specification.
+        :type network_spec: NetworkSpecification
+
+        :return: A list of nodes and a latency matrix.
+        :rtype: list, LatencyMatrix
+
+        """
         nodes = self.node_generator.generate(network_spec)
         latency_matrix = self.latency_generator.generate(nodes, network_spec)
         return nodes, latency_matrix

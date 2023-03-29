@@ -8,7 +8,6 @@ import pandas as pd
 import pycountry as pycountry
 import pycountry_convert as pycountry_convert
 
-
 country_bounds = None
 country_asn = None
 hops_graph = None
@@ -46,7 +45,8 @@ def __load_country_asn__():
         columns={'source': 'country', 'source_asn': 'asn'})
     dst_country_asn = hops_graph[['destination', 'dest_asn']].drop_duplicates().rename(
         columns={'destination': 'country', 'dest_asn': 'asn'})
-    graph_country_asn = pd.merge(src_country_asn, dst_country_asn, how='inner', on=['country', 'asn']).groupby('country')
+    graph_country_asn = pd.merge(src_country_asn, dst_country_asn, how='inner', on=['country', 'asn']).groupby(
+        'country')
     for country, asns in country_asn.items():
         if country not in graph_country_asn.groups:
             country_asn[country] = []
@@ -55,7 +55,6 @@ def __load_country_asn__():
         for asn in asns:
             if asn not in graph_asns:
                 country_asn[country].remove(asn)
-
 
 
 def load_country_asn(file):

@@ -1,5 +1,6 @@
 from ...types import NetworkSpecification, NetworkNode, MetaNode
 from ...utils import load_country_asn
+from ...utils.loaders import load_asns
 
 
 class NodeGenerator(object):
@@ -33,24 +34,81 @@ class NodeGenerator(object):
         :rtype: list
         """
         nodes = []
+        idx = 0
         for country, number in network_spec.countries.items():
-            for i in range(number):
-                nodes.append(self.generate_node(i, country))
+            n, idx = self.generate_nodes(idx, number, country)
+            nodes.extend(n)
 
         for continent, number in network_spec.continents.items():
-            for i in range(number):
-                nodes.append(self.generate_node(i, continent=continent))
+            n, idx = self.generate_nodes(idx, number, continent=continent)
+            nodes.extend(n)
 
         if len(nodes) < network_spec.nodes:
-            for i in range(network_spec.nodes - len(nodes)):
-                nodes.append(self.generate_node(i))
+            n, idx = self.generate_nodes(idx, network_spec.nodes - len(nodes))
+            nodes.extend(n)
 
         return nodes
 
+    def generate_nodes(self, idx, how_many, country=None, continent=None):
+        """Generate nodes.
+
+        :param idx: Index of the first node.
+        :type idx: int
+        :param how_many: Number of nodes to generate.
+        :type how_many: int
+        :param country: Country.
+        :type country: str | None
+        :param continent: Continent.
+        :type continent: str | None
+
+        :return: Nodes.
+        :rtype: list
+
+        :return: Index of the last node.
+        :rtype: int
+
+        """
+        nodes = []
+        if country is None:
+            countries = self.generate_country(continent, how_many)
+            countries_dict = {}
+            for c in countries:
+                if c in countries_dict:
+                    countries_dict[c] += 1
+                else:
+                    countries_dict[c] = 1
+            for c, n in countries_dict.items():
+                ns, idx = self.generate_nodes(idx, n, c)
+                nodes.extend(ns)
+        else:
+            longs, lats = self.generate_coordinates(country, how_many)
+            asns = self.generate_asn(country, how_many)
+            for i in range(how_many):
+                idx += 1
+                meta_node = MetaNode(idx, country, lats[i], longs[i], asns[i])
+                network_capacity = self.network_capacity_estimator.estimate(meta_node)
+                computational_capacity = self.computational_capacity_estimator.estimate(meta_node)
+                storage_capacity = self.storage_capacity_estimator.estimate(meta_node)
+                nodes.append(NetworkNode(meta_node, network_capacity, computational_capacity, storage_capacity))
+        return nodes, idx
+
     def generate_node(self, i, country=None, continent=None):
+        """Generate a node.
+
+        :param i: Index of the node.
+        :type i: int
+        :param country: Country.
+        :type country: str | None
+        :param continent: Continent.
+        :type continent: str | None
+
+        :return: Node.
+        :rtype: NetworkNode
+
+        """
         if country is None:
             country = self.generate_country(continent)
-        long, lat = self.generate_long_lat(country)
+        long, lat = self.generate_coordinates(country)
         asn = self.generate_asn(country)
         meta_node = MetaNode(i, country, lat, long, asn)
 
@@ -59,146 +117,16 @@ class NodeGenerator(object):
         storage_capacity = self.storage_capacity_estimator.estimate(meta_node)
         return NetworkNode(meta_node, network_capacity, computational_capacity, storage_capacity)
 
-    def generate_long_lat(self, country):
+    def generate_coordinates(self, country, how_many=None):
         raise NotImplementedError("NodeGenerator.generate_long_lat() must be implemented in a subclass.")
 
-    def generate_asn(self, country):
+    def generate_asn(self, country, how_many=None):
         raise NotImplementedError("NodeGenerator.generate_asn() must be implemented in a subclass.")
 
-    def generate_country(self, continent=None):
+    def generate_country(self, continent=None, how_many=None):
         raise NotImplementedError("NodeGenerator.generate_country() must be implemented in a subclass.")
 
-
-class Distribution(object):
-    """Base class for distributions.
-
-    A distribution is responsible for generating values from a distribution.
-
-    Parameters
-    ----------
-    None
-
-    Methods
-    -------
-    next()
-        Generate a value.
-
-    """
-
-    def __init__(self):
-        pass
-
-    def next(self):
-        """Generate a value.
-
-        :param args: Arguments.
-        :type args: list
-
-        :param kwargs: Keyword arguments.
-        :type kwargs: dict
-
-        :return: Value.
-        :rtype: object
-
-        """
-        raise NotImplementedError("Distribution.next() must be implemented in a subclass.")
-
-
-class AsnDistribution(Distribution):
-    """ASN distribution.
-
-    Generate ASNs from a distribution.
-
-    Parameters
-    ----------
-    None
-
-    Methods
-    -------
-    next(country)
-        Generate an ASN.
-
-    """
-
-    def __init__(self, asn_file=None):
-        asns = load_country_asn(asn_file)
-        super().__init__()
-
-    def next(self, country):
-        """Generate an ASN.
-
-        :param country: Country.
-        :type country: str
-
-        :return: ASN.
-        :rtype: int
-
-        """
-        raise NotImplementedError("AsnDistribution.next() must be implemented in a subclass.")
-
-
-class CountryDistribution(Distribution):
-    """Country distribution.
-
-    Generate countries from a distribution.
-
-    Parameters
-    ----------
-    None
-
-    Methods
-    -------
-    next()
-        Generate a country.
-
-    """
-
-    def __init__(self, countries_file=None):
-        super().__init__()
-
-    def next(self, continent=None):
-        """Generate a country.
-
-        :param continent: Continent.
-        :type continent: str
-
-        :return: Country.
-        :rtype: str
-
-        """
-        raise NotImplementedError("CountryDistribution.next() must be implemented in a subclass.")
-
-
-class LocationDistribution(Distribution):
-    """Location distribution.
-
-    Generate locations from a distribution.
-
-    Parameters
-    ----------
-    None
-
-    Methods
-    -------
-    next(country)
-        Generate a location.
-
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def next(self, country):
-        """Generate a location.
-
-        :param country: Country.
-        :type country: str
-
-        :return: Location.
-        :rtype: tuple
-
-        """
-        raise NotImplementedError("LocationDistribution.next() must be implemented in a subclass.")
+    pass
 
 
 class CapacityEstimator(object):
