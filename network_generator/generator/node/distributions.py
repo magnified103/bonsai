@@ -1,4 +1,5 @@
 import numpy as np
+from pyproj import CRS, Transformer, transform
 from shapely import Point
 
 
@@ -232,6 +233,7 @@ class MultinomialGeoDistributionFactory(GeoDistributionFactory):
         """
         super().__init__(country_bounds)
         self.dataset = dataset
+        # todo convert to km to latitude and longitude order
         self.drift = drift
 
     def create(self, key):
@@ -249,7 +251,8 @@ class MultinomialGeoDistributionFactory(GeoDistributionFactory):
         return BiasedGeoDistribution(self.country_bounds.loc[key].geometry, dist, self.drift)
 
     def __repr__(self):
-        return "MultinomialGeoDistributionFactory(dataset={}, country_bounds={})".format(self.dataset, self.country_bounds)
+        return "MultinomialGeoDistributionFactory(dataset={}, country_bounds={})".format(self.dataset,
+                                                                                         self.country_bounds)
 
     def __str__(self):
         return self.__repr__()
@@ -449,7 +452,9 @@ class BiasedGeoDistribution(GeoDistribution):
 
     def gen_point(self):
         x, y = self.bias.next()
-        pnt = Point(x + np.random.uniform(-self.drift, self.drift), y + np.random.uniform(-self.drift, self.drift))
+        buffer = self.geodesic_point_buffer(x, y, self.drift)
+        minx, miny, maxx, maxy = buffer.bounds
+        pnt = Point(x + np.random.uniform(minx, maxx), y + np.random.uniform(miny, maxy))
         return pnt
 
     def __repr__(self):
@@ -457,3 +462,28 @@ class BiasedGeoDistribution(GeoDistribution):
 
     def __str__(self):
         return "BiasedGeoDistribution(polygon={})".format(self.polygon)
+
+    def geodesic_point_buffer(self, lat, lon, km):
+        """
+        Create a buffer around a point with a given radius in kilometers.
+        Taken from https://gis.stackexchange.com/questions/289044/creating-buffer-circle-x-kilometers-from-point-using-python
+
+        :param lat: Latitude.
+        :type lat: float
+
+        :param lon: Longitude.
+        :type lon: float
+
+        :param km: Kilometers.
+        :type km: float
+
+        :return: Buffer.
+        :rtype: shapely.geometry.Polygon
+
+        """
+        # Azimuthal equidistant projection
+        aeqd_proj = CRS.from_proj4(
+            f"+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0")
+        tfmr = Transformer.from_proj(aeqd_proj, aeqd_proj.geodetic_crs)
+        buf = Point(0, 0).buffer(km * 1000)  # distance in metres
+        return transform(tfmr.transform, buf)
