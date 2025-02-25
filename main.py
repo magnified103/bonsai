@@ -28,13 +28,13 @@ default_config = {
                 'config': {
                     'mode': 'most_likely',
                     'batch_size': 100000,
-                    'model_path': 'bonsai-ML-network/models/bonsai-gnn-mdn-64-3-0.4-10-knn-20'
+                    'model_path': 'bonsainet/models/bonsai-gnn-mdn-64-3-0.4-10-knn-20'
                 }
             }
         }
     },
     'exporter': {
-        'type': 'default',
+        'type': 'link',
         'config': {}
     }
 }
@@ -42,11 +42,11 @@ default_config = {
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    generator_config = args.config
+    generator_config = args.generator_config
     net_config = args.net_config
     output_dir = args.output_dir
     
     bonsaiNMG = bonsai.from_config(generator_config, default_config)
-    nodes, edges = bonsaiNMG.generate(net_config)
+    nodes, edges, latency = bonsaiNMG.generate(net_config)
     
-    bonsaiNMG.export(nodes, edges, output_dir)
+    bonsaiNMG.export(nodes, edges, latency, output_dir)

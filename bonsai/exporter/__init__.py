@@ -13,5 +13,8 @@ def from_config(config):
     elif config['type'] == 'simpleTC':
         from .simpleTC import SimpleTCExporter
         return SimpleTCExporter(config['baseBandwidth'], config['subnet'])
+    elif config['type'] == 'link':
+        from .link import LinkExporter
+        return LinkExporter()
     else:
         raise ValueError('Exporter type not recognized')
