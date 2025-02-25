@@ -12,6 +12,10 @@ from bonsai.types import NetworkNode
 # sys.path.append('../bonsai-network/bonsainet/predictor')
 
 
+def from_config(config):
+    return BonsaiLatencyGenerator(mode=config['mode'], batch_size=config['batch_size'], model_path=config['model_path'])
+
+
 class BonsaiLatencyGenerator(LatencyGenerator):
     def __init__(self, mode='most_likely', batch_size=None, model_path=None):
         super()

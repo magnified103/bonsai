@@ -4,6 +4,19 @@ import torch
 
 from bonsai.types import NetworkNode
 
+def from_config(config):
+    estimator = None
+    if 'estimate' in config:
+        if config['estimator'] == 'random':
+            estimator = RandomLatencyEstimator(config['params']['min_value'], config['params']['max_value'], config['params']['seed'])
+        elif config['estimator'] == 'normal':
+            estimator = NormalLatencyEstimator(mean=config['params']['mean'], std=config['params']['std'], seed=config['params']['seed'])
+        elif config['estimator'] == 'fixed':
+            estimator == FixedLatencyEstimator(value=config['params']['value'])
+        else:
+            raise ValueError('LatencyEstimator type not recognized')
+    
+    return LatencyGenerator(estimator=estimator)
 
 class LatencyGenerator:
     """

@@ -1,5 +1,12 @@
-# bonsai-dev
+# Bonsai Network Generator
 
-Work in progress for Bonsai.
+Requirements:
+    - python 3.9
 
-Bonsai is a realistic network generator implemented in Python that uses machine learning to generate realistic latencies between arbitrary points.
+## Install and use as cmd line program
+
+Add text
+
+## Use as a python library
+
+Add text

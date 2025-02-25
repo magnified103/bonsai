@@ -2,6 +2,22 @@ import numpy as np
 from .base import CapacityEstimator
 
 
+def from_config(config):
+    """Instanciate a CapacityEstimator object from a configuration dictionary
+
+    :param config: configuration dictionary
+    """
+    if config['type'] == 'fixed':
+        return FixedEstimator(dataset=config.get('dataset'), value=config.get('value'))
+    elif config['type'] == 'normal':
+        return NormalEstimator(dataset=config.get('dataset'), mean=config.get('mean'), std=config.get('std'))
+    elif config['type'] == 'random':
+        return RandomEstimator(min_value=config.get('min_value'), max_value=config.get('max_value'), seed=config.get('seed'))
+    elif config['type'] == 'predictive':
+        raise NotImplementedError('Predictive estimator not implemented yet')
+    else:
+        raise ValueError('CapacityEstimator type not recognized')
+
 class RandomEstimator(CapacityEstimator):
     """ Random estimator.
 

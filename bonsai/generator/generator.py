@@ -38,7 +38,7 @@ generate(self, network_spec)
 
     """
 
-    def __init__(self, node_generator, latency_estimator=None):
+    def __init__(self, node_generator, latency_generator):
         """Initialize the generator.
 
         :param node_generator: The node generator to use.
@@ -48,7 +48,7 @@ generate(self, network_spec)
         :type latency_generator: LatencyGenerator
         """
         self.node_generator = node_generator
-        self.latency_generator = LatencyGenerator(latency_estimator)
+        self.latency_generator = latency_generator
 
     def generate(self, network_spec):
         """Generate a network of nodes and edges.
