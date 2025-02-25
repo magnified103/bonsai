@@ -58,4 +58,21 @@ class NetworkGenerator:
             'exporter': self.exporter.config()
         }
 
+    def from_config(config):
+        """
+        Instantiate a NetworkGenerator object from a configuration dictionary
 
+        :param config: configuration dictionary
+        :type config: dict
+        :return: NetworkGenerator object
+        """
+        from .parser import from_config as parser_from_config
+        from .interpreter import from_config as interpreter_from_config
+        from .generator import from_config as generator_from_config
+        from .exporter import from_config as exporter_from_config
+        
+        parser = parser_from_config(config['parser'])
+        interpreter = interpreter_from_config(config['interpreter'])
+        generator = generator_from_config(config['generator'])
+        exporter = exporter_from_config(config['exporter'])
+        return NetworkGenerator(parser, interpreter, generator, exporter)
