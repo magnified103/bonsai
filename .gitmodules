@@ -1,0 +1,3 @@
+[submodule "bonsai-ML-network"]
+	path = bonsai-ML-network
+	url = https://codelab.fct.unl.pt/di/computer-systems/bonsai-ML-network.git
