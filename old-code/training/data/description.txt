@@ -1,0 +1,6 @@
+aggPings.csv contains the aggregated ping data from the ripe atlas platform from the 10th of October of 2022 to the 20th of October of 2022.
+              The data has been curated by removing entries that do not contain geographical information, and by removing possible anycast addresses.
+
+aggPingsClean.csv contains the same data from aggPings.csv but with the additional filter of removing entries that have the same geographical features with
+                   a variability. Say for example, different nodes located in the same ASN, country, and coordinates, but with very different rtts.
+
