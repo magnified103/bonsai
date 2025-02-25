@@ -1,0 +1,17 @@
+graph:
+  args:
+    k: 20
+  method: knn
+hidden_layers:
+  dropout_layers:
+  - 0.4
+  - 0.4
+  - 0.4
+  hidden_layers:
+  - 64
+  - 64
+  - 64
+name: bonsai-gnn-mdn-64-3-0.4-10-knn-20
+output: 10
+test_data_path: /tmp/working_data/validation
+train_data_path: /tmp/working_data/train
