@@ -6,14 +6,11 @@ Requirements:
 ## Install and use as cmd line program
 
 
-1. ``git clone <repo>``
-2. ``cd <repo>``
-3. ``pip install virtualenv``(if not already installed)
-4. ``virtualenv venv``to create a new environment (called 'venv')
-5. ``source venv/bin/activate`` to enter the virtual environment
-6. ``pip install -r requirements.txt`` to install dependencies
-7. run as ``python -m main --net_config <network-config>.yaml --output_dir <output_dir>``
-8. To leave the virtual environment: ``deactivate``
+1. ``pip install torch~=2.2.2 numpy~=1.26.3 --index-url https://download.pytorch.org/whl/cpu``
+2. ``pip install torch-cluster~=1.6.3 -f https://data.pyg.org/whl/torch-2.2.2+cpu.html``
+3. ``pip install -r requirements.txt`` to install dependencies
+4. run as ``python -m main --net_config <network-config>.yaml --output_dir <output_dir>``
+5. To leave the virtual environment: ``deactivate``
 
 
 ## Use as a python library
